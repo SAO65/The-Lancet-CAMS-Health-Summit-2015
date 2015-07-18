@@ -1,0 +1,228 @@
+<span style="color: red"> THELANCET-D-15-02346 </span>
+
+Open access raw data, tidy data, code book and statistical inference for the journal article:
+
+Living longer with disability in China and G20 nations: a quantitative model for the Sustainable Development Goal for health post-2015. A reproducible research
+==========================================================================================
+
+## Accepted at the Lancet-Chinese Academy of Medical Science Health Summit, Beijing, China, Oct 30–31, 2015
+
+
+### Dr Stefano Olgiati, PhD, MS (1), Prof. Alessandro Danovi, MS (2)
+
+1.  Author Responsible For Correspondence: University of Bergamo <www.unibg.it>, Department of Quantitative Methods, via dei Caniana 2, Bergamo (ITA) 24129; tel  +39 035 20 52 638; fax +39 035 20 52 549; email <stefano.olgiati@unibg.it>
+2. University of Bergamo, Faculty of Economics, Bergamo (ITA) 24129
+
+<span style="color: red">
+__NOTICE TO FELLOW RESEARCHERS: THE WHO AS OF JULY 18, 2015, HAS UPDATED SOME DATABASES UTILIZED AS RAW DATA FOR THE TIDY DATASETS AND THE STATISTICAL INFERENCE. ACCORDINGLY, AFTER RUNNING THE PRESENT PROGRAM SOME OF THE NUMERIC FINDINGS MAY SLIGHTLY DIFFER  FROM THE FINDINGS REPORTED IN THE JOURNAL ARTICLE THELANCET-D-15-02346. THE AUTHORS HAVE CHOSEN NOT TO "FREEZE" THE ORIGINAL DATA SOURCE BUT TO ALLOW AUTOMATIC UPDATING OF THE RESEARCH FINDINGS IN THE HTML DOCUMENT. THIS CAN BE VERIFIED BY THE > dateDownloaded CODE IN R. THIS IS A FURTHER ADVANTAGE IN TERMS OF TRANSPARENCY OF RESEARCH REPRODUCIBILITY. THANK YOU. THE AUTHORS__
+</span>
+
+```{r echo=FALSE, results='hide'}
+library(data.table)
+library(car) # For computation of variance inflation factors VIF
+```
+
+### Raw Data
+We utilized open access data from:
+
+1. the Institute for Health Metrics and Evaluation (IHME) Global Burden of Disease Study 2010 [GHDx]("http://ghdx.healthmetricsandevaluation.org/sites/default/files/record-attached-files/IHME_GBD_2010_HALE_BY_COUNTRY_1990_2010_Y2010M02D23.CSV");
+
+2. the World Health Organization’s [Data Repository on Health Expenditure]("http://apps.who.int/gho/athena/data/xmart.csv?target=GHO/WHS7_156,WHS7_105,WHS7_104,WHS7_108&profile=xmart&filter=COUNTRY:*;REGION:AFR;REGION:AMR;REGION:SEAR;REGION:EUR;REGION:EMR;REGION:WPR").
+
+### Code Book
+The following variables and definitions, based on “The Global Burden of Disease: Generating Evidence, Guiding Policy” and the World Health Organization’s Data Repository on Health Expenditure, were adopted when extracting the tidy data set from the raw data:
+
+* Life Expectancy at birth: Life Expectancy at birth is the average number of years that a person can be expected to live from age 0-1;
+
+* Health Adjusted Life Expectancy (HALE) at birth: Healthy Life Expectancy at birth is the average number of years that a person can be expected to live in “full health”, by taking into account years lived in less than full health with disease and/or non-fatal injury ;
+
+* Years Lived with Disability (YLD): The Years Lived with Disability is the difference between LE and HALE, where LE is always greater than or equal to HALE. It is equivalent to the number of years that people live with a health condition or its consequences or in less than full health with disease and/or non-fatal injury;
+
+* Total Health Expenditure (THE): WHS7_105 Per capita total expenditure on health (PPP int.$) includes public (government, external resources for health from international programs and social security) and private expenditure (private pre-paid plans and out-of-pocket). For the purpose of international comparisons, THE is expressed in International Purchase Power Parity United States Dollars (USD PPP) which, according to the World Bank, is the number of units of a country’s currency required to buy the same amounts of goods and services in the domestic market as one US Dollar would buy in the United States.
+
+### Raw Data
+Downloading data from the repositories
+
+```{r, cache=TRUE}
+
+# Getting raw data from the IHME Global Burden of Disease Study 2010
+fileURL.GBD <- "http://ghdx.healthmetricsandevaluation.org/sites/default/files/record-attached-files/IHME_GBD_2010_HALE_BY_COUNTRY_1990_2010_Y2010M02D23.CSV"
+
+# Getting raw data from the WHO Health Expenditure Repository
+fileURL.WHO <- "http://apps.who.int/gho/athena/data/xmart.csv?target=GHO/WHS7_156,WHS7_105,WHS7_104,WHS7_108&profile=xmart&filter=COUNTRY:*;REGION:AFR;REGION:AMR;REGION:SEAR;REGION:EUR;REGION:EMR;REGION:WPR"
+
+download.file(fileURL.GBD, destfile="GBD.csv")
+download.file(fileURL.WHO, destfile="WHO.csv")
+
+dateDownloaded <- date()
+dateDownloaded
+```
+
+Reading raw data in .csv format
+````{r}
+# Raw Data
+raw.data.GBD <- read.csv("GBD.csv")
+raw.data.WHO <- read.csv("WHO.csv")
+names(raw.data.GBD)
+names(raw.data.WHO)
+dim(raw.data.GBD)
+dim(raw.data.WHO)
+
+# Data Tables
+attach(raw.data.GBD)
+attach(raw.data.WHO)
+
+DT.GBD <- data.table(raw.data.GBD)
+DT.WHO <- data.table(raw.data.WHO)
+
+tables()
+```
+
+
+### Tidy Data Set
+
+Manipulating data to generate tidy datasets
+```{r}
+# ISO3 codes of G20 Countries for 1990/95 - 2010
+# Argentina, Australia, Brazil, Canada, China, India, Indonesia, Japan, Mexico, Russia, Saudi Arabia, South Africa, South Korea, Turkey, the United Kingdom and the United States, European Union (EU)
+
+ISO3 <- c("ARG", "AUS", "BRA", "CAN","CHN","IND","IDN","JPN","MEX","RUS","SAU","ZAF","KOR","TUR","USA", "AUT","BEL","BGR","HRV","CYP","CZE","DNK","EST","FIN","FRA","DEU","GRC","HUN","IRL","ITA","LVA","LTU","LUX","MLT","NLD","POL","PRT","ROU","SVK","SVN","ESP","SWE","GBR")
+
+length(ISO3)
+
+data.GBD.1990 <- DT.GBD[DT.GBD$year == "1990" & DT.GBD$age_name == "0-1 years" & DT.GBD$sex_name == "Both" & DT.GBD$iso3 %in% ISO3 , ]
+data.GBD.1990.ordered <- data.GBD.1990[order(iso3), ]
+data.GBD.1990.ordered
+
+data.GBD.2010 <- DT.GBD[DT.GBD$year == "2010" & DT.GBD$age_name == "0-1 years" & DT.GBD$sex_name == "Both" & DT.GBD$iso3 %in% ISO3 , ]
+data.GBD.2010.ordered <- data.GBD.2010[order(iso3), ]
+
+data.WHO.1995 <- DT.WHO[DT.WHO$YEAR == "1995" & DT.WHO$GHO == "WHS7_105" & DT.WHO$Numeric != "NA" & DT.WHO$COUNTRY %in% ISO3,  ]
+data.WHO.1995.ordered <- data.WHO.1995[order(COUNTRY), ]
+
+data.WHO.2010 <- DT.WHO[DT.WHO$YEAR == "2010" & DT.WHO$GHO == "WHS7_105" & DT.WHO$Numeric != "NA" & DT.WHO$COUNTRY %in% ISO3,  ]
+data.WHO.2010.ordered <- data.WHO.2010[order(COUNTRY), ]
+
+data.WHO.2012 <- DT.WHO[DT.WHO$YEAR == "2012" & DT.WHO$GHO == "WHS7_105" & DT.WHO$Numeric != "NA" & DT.WHO$COUNTRY %in% ISO3,  ]
+data.WHO.2012.ordered <- data.WHO.2012[order(COUNTRY), ]
+
+data.1990 <- data.frame(country=data.GBD.1990.ordered$iso3, le=data.GBD.1990.ordered$le, hale=data.GBD.1990.ordered$hale, the=data.WHO.1995.ordered$Numeric)
+
+data.2010 <- data.frame(country=data.GBD.2010.ordered$iso3, le=data.GBD.2010.ordered$le, le_ui = data.GBD.2010.ordered$le_ui, hale=data.GBD.2010.ordered$hale, hale_ui = data.GBD.2010.ordered$hale_ui, the=data.WHO.2010.ordered$Numeric)
+
+data.2012 <- data.frame(country=data.GBD.2010.ordered$iso3, the=data.WHO.2012.ordered$Numeric)
+
+
+# Years Lived with Disease in G20 Countries for 1990 - 2010
+yld.1990 <- data.1990$le - data.1990$hale
+yld.2010 <- data.2010$le - data.2010$hale
+
+# Tidy Dataset
+tidy.data <- data.frame(country=data.2010$country, the_1995=data.1990$the, the_2010=data.2010$the, the_2012=data.2012$the, le_1990=data.1990$le,  le_2010=data.2010$le, le_ui_2010=data.2010$le_ui, hale_ui_2010=data.2010$hale_ui, hale_1990 = data.1990$hale, hale_2010 = data.2010$hale, yld_1990=yld.1990, yld_2010=yld.2010)
+
+attach(tidy.data)
+
+# Saving Tidy Dataset to .csv file
+write.csv(tidy.data, "YLDOutput.csv")
+```
+
+### Background
+```{r}
+# Data for background and rationale
+tidy.data$le_2010[tidy.data$country == "CHN"]
+tidy.data$le_1990[tidy.data$country == "CHN"]
+median(tidy.data$le_2010)
+mad(tidy.data$le_2010)
+
+tidy.data$yld_2010[tidy.data$country == "CHN"]
+tidy.data$yld_1990[tidy.data$country == "CHN"]
+median(tidy.data$yld_2010)
+mad(tidy.data$yld_2010)
+mean(tidy.data$yld_2010)
+var(tidy.data$yld_2010)
+
+tidy.data$hale_2010[tidy.data$country == "CHN"]
+tidy.data$hale_1990[tidy.data$country == "CHN"]
+median(tidy.data$hale_2010)
+mad(tidy.data$hale_2010)
+
+tidy.data$the_2012[tidy.data$country == "CHN"]
+median(tidy.data$the_2010)
+mad(tidy.data$the_2010)
+```
+
+
+### Exploratory Data Analysis
+```{r}
+# Strip Charts
+strip.data.1 <- data.frame(le_1990, le_2010, hale_1990, hale_2010)
+stripchart(strip.data.1, vertical=TRUE, col=1:6, method="jitter")
+abline(h=c(median(le_1990), median(le_2010), median(hale_1990), median(hale_2010)),col=1:6) 
+summary(strip.data.1)
+
+par(mfrow=(c(1,2)))
+strip.data.the <- data.frame(the_1995, the_2010)
+stripchart(strip.data.the, vertical=TRUE, col=1:2, method="jitter")
+abline(h=c(median(the_1995), median(the_2010)), col=1:2)
+summary(strip.data.the)
+
+strip.data.yld <- data.frame(yld_1990, yld_2010)
+stripchart(strip.data.yld, vertical=TRUE, col=1:2, method="jitter")
+abline(h=c(median(yld_1990), median(yld_2010)), col=1:2)
+summary(strip.data.yld)
+
+# Histograms
+par(mfrow=(c(1,3)))
+hist(hale_2010, breaks=10)
+hist(yld_2010, breaks=10)
+hist(the_2010, breaks=10)
+
+# Normality and skewness
+par(mfrow=(c(1,3)))
+qqnorm(hale_2010, main="hale_2010")
+qqline(hale_2010, col="red")
+qqnorm(yld_2010, main="yld_2010")
+qqline(yld_2010, col="red")
+qqnorm(the_2010, main="the_2010")
+qqline(the_2010, col="red")
+```
+
+### Model and Multiple Linear Regression
+````{r}
+# Linear regression
+model <- lm(log(the_2010)~yld_2010 + hale_2010)
+
+summary(model)
+
+coef(model)
+exp(coef(model)["yld_2010"])
+exp(coef(model)["hale_2010"])
+
+confint(model)
+exp(confint(model))
+
+# VIF
+vif(model)
+
+# General Linear Hypothesis Test
+library("multcomp")
+interact <- glht(model)
+interact
+summary(interact)
+
+# Analysis of Variance Table
+anova(model)
+
+# Prediction
+predconf <- predict(model, data.frame(yld_2010 = median(tidy.data$yld_2010), hale_2010 = median(tidy.data$hale_2010)), interval="confidence")
+predconf
+lower <- exp(predconf[,"lwr"])
+fit <- exp(predconf[,"fit"])
+upper <- exp(predconf[,"upr"])
+mat <- cbind(fit, lower, upper)
+df <- data.frame(mat)
+df
+
+```
+
+ 
