@@ -14,7 +14,14 @@ Living longer with disability in China and G20 nations: a quantitative model for
 2. University of Bergamo, Faculty of Economics, Bergamo (ITA) 24129
 
 <span style="color: red">
-__NOTICE TO FELLOW RESEARCHERS: THE WHO AS OF JULY 18, 2015, HAS UPDATED SOME DATABASES UTILIZED AS RAW DATA FOR THE TIDY DATASETS AND THE STATISTICAL INFERENCE. ACCORDINGLY, AFTER RUNNING THE PRESENT PROGRAM SOME OF THE NUMERIC FINDINGS MAY SLIGHTLY DIFFER  FROM THE FINDINGS REPORTED IN THE JOURNAL ARTICLE THELANCET-D-15-02346 (DOI not yet released). THE AUTHORS HAVE CHOSEN NOT TO "FREEZE" THE ORIGINAL DATA SOURCE BUT TO ALLOW AUTOMATIC UPDATING OF THE RESEARCH FINDINGS IN THE HTML DOCUMENT. THIS CAN BE VERIFIED BY THE > dateDownloaded CODE IN R AND TRACED BY SUBSEQUENT UPDATES IN THE OA GITHUB REPOSITORY. THIS IS A FURTHER ADVANTAGE IN TERMS OF TRANSPARENCY OF RESEARCH REPRODUCIBILITY. THANK YOU. THE AUTHORS__
+__NOTICE TO FELLOW RESEARCHERS:___ 
+___1) THE WHO AS OF JULY 18, 2015, HAS UPDATED SOME DATABASES UTILIZED AS RAW DATA FOR THE TIDY DATASETS AND THE STATISTICAL INFERENCE. ACCORDINGLY, AFTER RUNNING THE PRESENT PROGRAM SOME OF THE NUMERIC FINDINGS MAY SLIGHTLY DIFFER  FROM THE FINDINGS REPORTED IN THE JOURNAL ARTICLE THELANCET-D-15-02346 (DOI not yet released). THE AUTHORS HAVE CHOSEN NOT TO "FREEZE" THE ORIGINAL DATA SOURCE BUT TO ALLOW AUTOMATIC UPDATING OF THE RESEARCH FINDINGS IN THE HTML DOCUMENT. THIS CAN BE VERIFIED BY THE > dateDownloaded CODE IN R AND TRACED BY SUBSEQUENT UPDATES IN THE OA GITHUB REPOSITORY. THIS IS A FURTHER ADVANTAGE IN TERMS OF TRANSPARENCY OF RESEARCH REPRODUCIBILITY;___
+
+__2)AS OF OCTOBER 2, 2015 THE UNIVERSITY OF WASHINGTON GBDx HAS PERMANENTLY MOVED THE URL. THE DOWNLOAD CODE HAS BEEN UPDATED AND THE MESSAGE FROM THE OLD URL UPLOADED IN GITHUB FOR TRANSPARENCY AND EVIDENCE__
+
+__3)AS OF OCTOBER 2, 2015 SOFTWARE UPDATE TO MAC OS X EL CAPITAN 10.11 HAS REQUIRED TO ADD THE METHOD "curl" TO download.file function in R__
+
+__THANK YOU. THE AUTHORS__
 </span>
 
 ```{r echo=FALSE, results='hide'}
@@ -160,7 +167,7 @@ stripchart(strip.data.1,
            lty = "solid", 
            lwd = 2,
            method="jitter", 
-           main="Life Expectancy \n at birth in China and G20 nations",
+           main="Life Expectancy",
            ylab="Number of Years")
 abline(h=c(median(le_1990), median(le_2010)),col=c("black", "skyblue"),
            lty = "solid", 
@@ -179,7 +186,7 @@ stripchart(strip.data.2,
            lty = "solid", 
            lwd = 2,
            method="jitter", 
-           main="Health-Adjusted Life Expectancy \n at birth in China and G20 nations",
+           main="Health-Adjusted \n Life Expectancy",
            ylab="Number of Years")
 abline(h=c(median(hale_1990), median(hale_2010)),col=c("black", "skyblue"),
            lty = "solid", 
@@ -197,7 +204,7 @@ stripchart(strip.data.3,
            lty = "solid", 
            lwd = 2,
            method="jitter", 
-           main="Years Lived with Disease \n at birth in China and G20 nations",
+           main="Years Lived with Disease",
            ylab="Number of Years")
 abline(h=c(median(yld_1990), median(yld_2010)),col=c("black", "skyblue"),
            lty = "solid", 
@@ -215,7 +222,7 @@ stripchart(strip.data.4,
            lwd = 2,
            col=c("black", "skyblue"),
            method="jitter", 
-           main="Per-capita Total Health \n Expenditure in China and G20 nations",
+           main="Per-capita \n Total Health Expenditure",
            ylab="PPP int.$")
 abline(h=c(median(the_1995), median(the_2010)),col=c("black", "skyblue"),
            lty = "solid", 
@@ -276,7 +283,6 @@ upper <- exp(predconf[,"upr"])
 mat <- cbind(fit, lower, upper)
 df <- data.frame(mat)
 df
-
 ```
 
  
