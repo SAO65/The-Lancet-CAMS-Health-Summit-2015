@@ -27,6 +27,7 @@ __THANK YOU. THE AUTHORS__
 ```{r echo=FALSE, results='hide'}
 library(data.table)
 library(car) # For computation of variance inflation factors VIF
+library(scatterplot3d) 
 ```
 
 ### Raw Data
@@ -234,9 +235,9 @@ summary(strip.data.3)
 
 # Histograms
 par(mfrow=(c(1,3)))
-hist(hale_2010, breaks=10)
-hist(yld_2010, breaks=10)
-hist(the_2010, breaks=10)
+hist(hale_2010, breaks=10, xlab="YEARS", main="HALE")
+hist(yld_2010, breaks=10, xlab="YEARS", main="YLD")
+hist(the_2010, breaks=10, xlab="PPP int.$", main="THE")
 
 # Normality and skewness
 par(mfrow=(c(1,3)))
